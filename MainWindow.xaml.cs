@@ -27,8 +27,6 @@ namespace PM
     
     public partial class MainWindow : Window  
     {
-        ContentControl view1 = new ProjectsList();
-        ContentControl view3 = new BeaconSpecs();
         
         /*
          * Constructor for the window 
@@ -37,7 +35,7 @@ namespace PM
         {
             DataContext = this;
             InitializeComponent();
-            this.contentControl.Content = view1;
+            this.contentControl.Content = new ProjectsList();
            
         }
 
@@ -52,7 +50,7 @@ namespace PM
             }
             else
             {
-                contentControl.Content = view1;
+                contentControl.Content = new ProjectsList();
             }
             
         }
@@ -68,23 +66,24 @@ namespace PM
             }
             else
             {
-                contentControl.Content = view3;
+                contentControl.Content = new BeaconSpecs();
+            }
+        }
+
+        private void IPAssignment_Click(object sender, RoutedEventArgs e)
+        {
+            if (contentControl.Content is IPAssignment)
+            {
+                return;
+            }
+            else
+            {
+                contentControl.Content = new IPAssignment();
             }
         }
 
         /*
          * Event handler for clicking the "Project Details" button
          */
-        private void projectDetails_Click(object sender, RoutedEventArgs e)
-        {
-            if (contentControl.Content is ProjectDetails)
-            {
-                return;
-            }
-            else
-            {
-                contentControl.Content = new ProjectDetails(((ProjectsList)(view1)).SelectedProject);
-            }
-        }
     }
 }

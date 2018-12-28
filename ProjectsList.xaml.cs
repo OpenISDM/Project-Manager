@@ -17,7 +17,6 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using Microsoft.WindowsAPICodePack.Shell;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace PM
@@ -59,14 +58,10 @@ namespace PM
             Random rnd = new Random();
             if (String.IsNullOrEmpty(proj) || proj == "Please Select")
             {
-                proj = projectSelect.SelectedItem as string;
-                if (String.IsNullOrEmpty(proj) || proj == "Please Select")
-                {
-                    listView33.ItemsSource = null;
-                    return;
-                }
+                lbProject.ItemsSource = null;
+                return;
             }
-            ObservableCollection<ProjectFiles> lopf = new ObservableCollection<ProjectFiles>();
+            List<ProjectFiles> lopf = new List<ProjectFiles>();
             var fileNames = Directory.GetFiles(proj, "*.rvt");
             foreach (string fn in fileNames)
             {
@@ -86,29 +81,7 @@ namespace PM
                 {
                     Console.WriteLine("Trying to load XML for {0}......", fi.Name);
                     XDocument objDoc = XDocument.Load(fi.FullName.Replace(".rvt", ".xml"));
-                    if (objDoc.Descendants("BeaconFamily").Any())
-                    {
-                        foreach (var fam in objDoc.Descendants("BeaconFamily"))
-                        {
-                            string famName = fam.Value;
-                            foreach (var BType in fam.Descendants("BeaconType"))
-                            {
-                                string typeName = BType.Value;
-                                if (BType.Descendants("Instance").Any())
-                                {
-                                    foreach (var BInstance in BType.Descendants("Instance"))
-                                    {
-                                        ++bc;
-
-                                        XElement height = BInstance.Element("BeaconHeight");
-                                        XElement level = BInstance.Element("BeaconLevel");
-                                    }
-                                }
-                                else { Console.WriteLine("No instances of {0} in {1}", typeName, fi.Name); }
-                            }
-                        }
-                    }
-                    else { Console.WriteLine("No BeaconFamily in {0}", fi.Name); }
+                    bc = objDoc.Descendants("node").Count();
                 }
                 catch (FileNotFoundException)
                 {
@@ -118,29 +91,7 @@ namespace PM
                 lopf.Add(new ProjectFiles() { Title = fi.Name, FullPath = fi.FullName, Attr = fi.Attributes, AccsTime = fi.LastWriteTime, Icon = bmpSrc, RenderedImg = renderedImg, BeaconCount = bc, Progress = rnd.Next(0, 100) });
 
             }
-            listView33.ItemsSource = lopf;
-        }
-
-        /*
-         * Event Handler to show all files in the folder when the "See All Files" button is clicked 
-         */
-        private void SeeAllFiles_Click(object sender, RoutedEventArgs e)
-        {
-            lbFiles.Items.Clear();
-
-            string proj;
-            proj = projectSelect.SelectedItem as string;
-            if (String.IsNullOrEmpty(proj) || proj == "Please Select")
-            {
-                return;
-            }
-            var fileNames = Directory.GetFiles(proj, "*");
-
-            foreach (string fn in fileNames)
-            {
-                FileInfo fi = new FileInfo(fn);
-                lbFiles.Items.Add(fi.Name);
-            }
+            lbProject.ItemsSource = lopf;
         }
 
         /* 
@@ -155,7 +106,6 @@ namespace PM
                 if (p != null)
                 {
                     Process.Start(p.FullPath);
-                    updateLastOpenedFile(p);
                 }
             }
             updateFiles();
@@ -175,14 +125,6 @@ namespace PM
             pbStatus.Value = p.Progress;
         }
 
-        /* 
-         * Update the panel on the right hand side to show most recently opened file
-         */
-        private void updateLastOpenedFile(ProjectFiles p)
-        {
-            Pooplabel1.Content = p.Title;
-        }
-
         /*
          * opens the file when users click on the open button
          */
@@ -193,7 +135,6 @@ namespace PM
                 System.Windows.Controls.Button btn = (System.Windows.Controls.Button)sender;
                 ProjectFiles p = btn.DataContext as ProjectFiles;
                 Process.Start(p.FullPath);
-                updateLastOpenedFile(p);
             }
             updateFiles();
         }
@@ -259,7 +200,7 @@ namespace PM
         /*
          * Event handler for project selection changed
          */
-        private void listView33_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void lbProject_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (sender != null)
             {
@@ -273,42 +214,14 @@ namespace PM
             }
         }
 
-        /*
-         * Event handler for adding new Revit file to project folder, needs improvement
-         * TODO: Make the file usable 
-         */
-        private void AddToProject_Click(object sender, RoutedEventArgs e)
+        private void BtnBeaconList_Click(object sender, RoutedEventArgs e)
         {
-            string proj;
-            proj = projectSelect.SelectedItem as string;
-            if (String.IsNullOrEmpty(proj) || proj == "Please Select")
+            if (SelectedProject != null)
             {
-                System.Windows.MessageBox.Show("Please Select a Project!");
+                this.Content = new BeaconsList(SelectedProject);
             }
-            else
-            {
-                var fn = NewFileName.Text;
-                if (fn == null)
-                {
-                    fn = System.IO.Path.GetRandomFileName();
-                }
-                try
-                {
-                    File.Create(proj + @"\" + fn + ".rvt");
-                    updateFiles();
-                }
-                catch
-                {
-                    System.Windows.MessageBox.Show("Error", "Cannot Create File!");
-                }
-            }
-        }
-
-        private void lbFiles_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
         }
     }
 }
-    
+
 

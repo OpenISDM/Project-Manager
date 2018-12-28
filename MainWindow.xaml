@@ -11,7 +11,7 @@
         
         <ContentControl x:Name="contentControl" Margin="0,0,0,0"/>
         <Button x:Name="projectsList" Content="Project Items" HorizontalAlignment="Left" Margin="12,578,0,0" Grid.Row ="1" VerticalAlignment="Top" Width="234" Height="142" Grid.Column="1" Click="projectsList_Click"/>
-        <Button x:Name="projectDetail" IsEnabled="{Binding ElementName=listView33, Path=SelectedItems.Count}" Content="Project Details" HorizontalAlignment="Left" Margin="256,578,0,0" Grid.Row="1" VerticalAlignment="Top" Width="234" Height="142" Grid.Column="1" Click="projectDetails_Click"/>
+        <Button x:Name="IPAssignment" IsEnabled="{Binding ElementName=listView33, Path=SelectedItems.Count}" Content="IP Assignment" HorizontalAlignment="Left" Margin="256,578,0,0" Grid.Row="1" VerticalAlignment="Top" Width="234" Height="142" Grid.Column="1" Click="IPAssignment_Click"/>
         <Button x:Name="beaconSpecs" Content="LBeacon Specifications" HorizontalAlignment="Left" Margin="500,578,0,0" Grid.Row="1" VerticalAlignment="Top" Width="234" Height="142" Grid.Column="1" Click="beaconSpecs_Click"/>
     </Grid>
 </Window>
